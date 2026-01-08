@@ -108,6 +108,7 @@ pub fn initialize_nt_offsets() -> anyhow::Result<()> {
                 0x01,
                 0x05,
             ),
+
             /* Windows 10 19045.4046 */
             Signature::relative_address(
                 obfstr!("PsGetNextProcess (19045.4046)"),
@@ -164,6 +165,23 @@ pub fn initialize_nt_offsets() -> anyhow::Result<()> {
             Signature::offset(
                 obfstr!("_EPROCESS.ThreadListHead (Win 11)"),
                 obfstr!("4C 8D A9 ? ? ? ? 33 DB"),
+                0x03,
+            ),
+            /* Windows 11 24H2 26100.7462 - ThreadListHead offset 0x370
+             * Pattern from PspGetPreviousProcessThread:
+             *   mov r12, gs:[188h]    ; 65 4C 8B 24 25 88 01 00 00
+             *   lea r14, [rcx+370h]   ; 4C 8D B1 70 03 00 00  <- ThreadListHead
+             *   mov rsi, rdx          ; 48 8B F2
+             */
+            Signature::offset(
+                obfstr!("_EPROCESS.ThreadListHead (26100)"),
+                obfstr!("65 4C 8B 24 25 88 01 00 00 4C 8D B1 ? ? ? ? 48 8B F2"),
+                0x0C,
+            ),
+            /* Windows 11 25H2 26200.7462 */
+            Signature::offset(
+                obfstr!("_EPROCESS.ThreadListHead (26200)"),
+                obfstr!("4C 8D B1 ? ? ? ? 48 8B F2"),
                 0x03,
             ),
             /* Windows 10 19045.4046 (Actually finds PspGetPreviousProcessThread and PsGetNextProcessThread) */
